@@ -1,0 +1,66 @@
+Sub vbachallenge()
+
+    'Define variables
+    Dim Ticker As String
+    Dim OpenPrice As Double
+    Dim ClosePrice As Double
+    Dim TotalStockVol As Double
+    Dim LastRow As Long
+    Dim SummaryTableRow As Long
+    Dim i As Long
+    Dim j As Long
+    
+    'Set variables
+    TotalStockVol = 0
+    LastRow = Cells(Rows.Count, 1).End(xlUp).Row
+    SummaryTableRow = 2
+    
+    'Create table headers
+    Cells(1, 10).Value = "Ticker"
+    Cells(1, 11).Value = "Yearly Change"
+    Cells(1, 12).Value = "Percent Change"
+    Cells(1, 13).Value = "Total Stock Volume"
+    
+    
+    'Loop through stock trades
+    For i = 2 To LastRow
+
+        'Check to see if you need to store open price
+        If Cells(i, 1).Value <> Cells(i - 1, 1).Value Then
+            OpenPrice = Cells(i, 3).Value
+            TotalStockVol = Cells(i, 7).Value
+        
+        'Check to see if need to increment Stock Volume
+        ElseIf Cells(i, 1).Value = Cells(i - 1, 1).Value And Cells(i, 1).Value = Cells(i + 1, 1).Value Then
+            TotalStockVol = TotalStockVol + Cells(i, 7).Value
+        
+        'Check to see if last line of stock
+        ElseIf Cells(i, 1).Value = Cells(i - 1, 1).Value And Cells(i, 1).Value <> Cells(i + 1, 1).Value Then
+            ClosePrice = Cells(i, 6).Value
+            TotalStockVol = TotalStockVol + Cells(i, 7).Value
+            Ticker = Cells(i, 1).Value
+            
+            'Print values to table
+            Cells(SummaryTableRow, 10).Value = Ticker
+            Cells(SummaryTableRow, 11).Value = ClosePrice - OpenPrice
+            Cells(SummaryTableRow, 12).Value = (ClosePrice / OpenPrice) - 1
+            Cells(SummaryTableRow, 13).Value = TotalStockVol
+            
+            'Format output
+            Cells(SummaryTableRow, 11).NumberFormat = "0.00"
+            Cells(SummaryTableRow, 12).NumberFormat = "0.00%"
+            If Cells(SummaryTableRow, 11).Value < 0 Then
+                Cells(SummaryTableRow, 11).Interior.ColorIndex = 3
+            Else: Cells(SummaryTableRow, 11).Interior.ColorIndex = 10
+            End If
+            
+            'Increment Summary Table rows and reset stock volume
+            SummaryTableRow = SummaryTableRow + 1
+            TotalStockVol = 0
+            
+        End If
+
+    Next i
+    
+End Sub
+
